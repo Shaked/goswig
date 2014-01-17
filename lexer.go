@@ -43,78 +43,87 @@ type parseRule struct {
 	replace  map[string]string
 }
 
-var rules = []parseRule{
+var rules = []*parseRule{
 	&parseRule{
 		TYPE_WHITESPACE,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\s+/`),
+			regexp.MustCompile(`^\s+`),
 		},
 		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_STRING,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^""/`),
-			regexp.MustCompile(`/^".*?[^\\]"/`),
-			regexp.MustCompile(`/^''/`),
-			regexp.MustCompile(`/^'.*?[^\\]'/`),
+			regexp.MustCompile(`^""`),
+			regexp.MustCompile(`^".*?[^\\]"`),
+			regexp.MustCompile(`^''`),
+			regexp.MustCompile(`^'.*?[^\\]'`),
 		},
 		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_FILTER,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\|\s*(\w+)\(/`),
+			regexp.MustCompile(`^\|\s*(\w+)\(`),
 		},
 		1,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_FILTEREMPTY,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\|\s*(\w+)/`),
+			regexp.MustCompile(`^\|\s*(\w+)`),
 		},
 		1,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_FUNCTIONEMPTY,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\s*(\w+)\(\)/`),
+			regexp.MustCompile(`^\s*(\w+)\(\)`),
 		},
 		1,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_FUNCTION,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\s*(\w+)\(/`),
+			regexp.MustCompile(`^\s*(\w+)\(`),
 		},
 		1,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_PARENOPEN,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\(/`),
+			regexp.MustCompile(`^\(`),
 		},
 		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_PARENCLOSE,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\)/`),
+			regexp.MustCompile(`^\)`),
 		},
 		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_COMMA,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^,/`),
+			regexp.MustCompile(`^,`),
 		},
 		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_LOGIC,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^(&&|\|\|)\s*/`),
-			regexp.MustCompile(`/^(and|or)\s+/`),
+			regexp.MustCompile(`^(&&|\|\|)\s*`),
+			regexp.MustCompile(`^(and|or)\s+`),
 		},
 		1,
 		map[string]string{
@@ -125,7 +134,7 @@ var rules = []parseRule{
 	&parseRule{
 		TYPE_COMPARATOR,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^(===|==|\!==|\!=|<=|<|>=|>|in\s|gte\s|gt\s|lte\s|lt\s)\s*/`),
+			regexp.MustCompile(`^(===|==|\!==|\!=|<=|<|>=|>|in\s|gte\s|gt\s|lte\s|lt\s)\s*`),
 		},
 		1,
 		map[string]string{
@@ -138,14 +147,16 @@ var rules = []parseRule{
 	&parseRule{
 		TYPE_ASSIGNMENT,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^(=|\+=|-=|\*=|\/=)/`),
+			regexp.MustCompile(`^(=|\+=|-=|\*=|\/=)`),
 		},
+		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_NOT,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\!\s*/`),
-			regexp.MustCompile(`/^not\s+/`),
+			regexp.MustCompile(`^\!\s*`),
+			regexp.MustCompile(`^not\s+`),
 		},
 		0,
 		map[string]string{
@@ -155,66 +166,84 @@ var rules = []parseRule{
 	&parseRule{
 		TYPE_BOOL,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^(true|false)\s+/`),
-			regexp.MustCompile(`/^(true|false)$/`),
+			regexp.MustCompile(`^(true|false)\s+`),
+			regexp.MustCompile(`^(true|false)$`),
 		},
 		1,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_VAR,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^[a-zA-Z_$]\w*((\.\w*)+)?/`),
-			regexp.MustCompile(`/^[a-zA-Z_$]\w*/`),
+			regexp.MustCompile(`^[a-zA-Z_$]\w*((\.\w*)+)?`),
+			regexp.MustCompile(`^[a-zA-Z_$]\w*`),
 		},
+		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_BRACKETOPEN,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\[/`),
+			regexp.MustCompile(`^\[`),
 		},
+		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_BRACKETCLOSE,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\]/`),
+			regexp.MustCompile(`^\]`),
 		},
+		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_CURLYOPEN,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\{/`),
+			regexp.MustCompile(`^\{`),
 		},
+		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_COLON,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\:/`),
+			regexp.MustCompile(`^\:`),
 		},
+		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_CURLYCLOSE,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\}/`),
+			regexp.MustCompile(`^\}`),
 		},
+		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_DOTKEY,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^\.(\w+)/`),
+			regexp.MustCompile(`^\.(\w+)`),
 		},
 		1,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_DOTKEY,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^[+\-]?\d+(\.\d+)?/`),
+			regexp.MustCompile(`^[+\-]?\d+(\.\d+)?`),
 		},
+		0,
+		map[string]string{},
 	},
 	&parseRule{
 		TYPE_OPERATOR,
 		[]*regexp.Regexp{
-			regexp.MustCompile(`/^(\+|\-|\/|\*|%)/`),
+			regexp.MustCompile(`^(\+|\-|\/|\*|%)`),
 		},
+		0,
+		map[string]string{},
 	},
 }
 
@@ -225,21 +254,24 @@ type matchedRule struct {
 }
 
 func reader(str string) *matchedRule {
-	for rule := range rules {
-		for regex := range rule.regex {
-			match := regex.FindAllString(str)
+	for _, rule := range rules {
+		for _, regex := range rule.regex {
+			match := regex.FindAllStringSubmatch(str, -1)
 			if nil == match {
 				continue
 			}
 
-			normalized := strings.Trim(match[rule.idx], " ")
-			//TODO
-			//normalized = (rule.hasOwnProperty('replace') && rule.replace.hasOwnProperty(normalized)) ? rule.replace[normalized] : normalized;
+			normalized := strings.Trim(match[0][rule.idx], " ")
+			if nil != rule.replace {
+				for from, to := range rule.replace {
+					normalized = strings.Replace(normalized, from, to, -1)
+				}
+			}
 
 			return &matchedRule{
 				match:    normalized,
 				ruleType: rule.ruleType,
-				length:   len(match[0]),
+				length:   len(match[0][0]),
 			}
 		}
 	}
@@ -252,10 +284,11 @@ func reader(str string) *matchedRule {
 
 func read(str string) []*matchedRule {
 	offset := 0
+	tokens := make([]*matchedRule, 0)
 	for offset < len(str) {
 		substr := str[offset:]
 		match := reader(substr)
-		offset += len(match.length)
+		offset += match.length
 		tokens = append(tokens, match)
 	}
 	return tokens
