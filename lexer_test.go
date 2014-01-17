@@ -41,7 +41,7 @@ func TestReader(t *testing.T) {
 		if test.out.match != result.match || test.out.ruleType != result.ruleType || test.out.length != result.length {
 			fmt.Printf("%#v\n", test.out)
 			fmt.Printf("%#v\n", result)
-			t.Error("Lexer failed for ", test.in, " expected ", test.out, " got ", result)
+			t.Error("Lexer failed for", test.in, "expected", test.out, " got ", result)
 		}
 	}
 }
