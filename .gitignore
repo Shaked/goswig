@@ -20,3 +20,9 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+
+autotest.sh
+
+cycle.sh
+
+cover.out
