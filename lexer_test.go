@@ -379,6 +379,14 @@ func TestReader(t *testing.T) {
 				length:   1,
 			},
 		},
+		{
+			`#`,
+			&matchedRule{
+				match:    `#`,
+				ruleType: TYPE_UNKNOWN,
+				length:   1,
+			},
+		},
 	}
 
 	for _, test := range readertests {
