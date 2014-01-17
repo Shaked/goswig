@@ -1,0 +1,212 @@
+package swig
+
+const (
+	TYPE_WHITESPACE = iota
+	TYPE_STRING
+	TYPE_FILTER
+	TYPE_FILTEREMPTY
+	TYPE_FUNCTION
+	TYPE_FUNCTIONEMPTY
+	TYPE_PARENOPEN
+	TYPE_PARENCLOSE
+	TYPE_COMMA
+	TYPE_VAR
+	TYPE_NUMBER
+	TYPE_OPERATOR
+	TYPE_BRACKETOPEN
+	TYPE_BRACKETCLOSE
+	TYPE_DOTKEY
+	TYPE_ARRAYOPEN
+	TYPE_ARRAYCLOSE
+	TYPE_CURLYOPEN
+	TYPE_CURLYCLOSE
+	TYPE_COLON
+	TYPE_COMPARATOR
+	TYPE_LOGIC
+	TYPE_NOT
+	TYPE_BOOL
+	TYPE_ASSIGNMENT
+	TYPE_METHODOPEN
+	TYPE_METHODEND
+)
+const UNKNOWN = 100
+
+type parseRule struct {
+	ruleType int
+	regex    []string
+	idx      int
+	replace  map[string]string
+}
+
+var rules = []parseRule{
+	&parseRule{
+		TYPE_WHITESPACE,
+		[]string{`/^\s+/`},
+		0,
+	},
+	&parseRule{
+		TYPE_STRING,
+		[]string{
+			`/^""/`,
+			`/^".*?[^\\]"/`,
+			`/^''/`,
+			`/^'.*?[^\\]'/`,
+		},
+		0,
+	},
+	&parseRule{
+		TYPE_FILTER,
+		[]string{
+			`/^\|\s*(\w+)\(/`,
+		},
+		1,
+	},
+	&parseRule{
+		TYPE_FILTEREMPTY,
+		[]string{
+			`/^\|\s*(\w+)/`,
+		},
+		1,
+	},
+	&parseRule{
+		TYPE_FUNCTIONEMPTY,
+		[]string{
+			`/^\s*(\w+)\(\)/`,
+		},
+		1,
+	},
+	&parseRule{
+		TYPE_FUNCTION,
+		[]string{
+			`/^\s*(\w+)\(/`,
+		},
+		1,
+	},
+	&parseRule{
+		TYPE_PARENOPEN,
+		[]string{
+			`/^\(/`,
+		},
+		0,
+	},
+	&parseRule{
+		TYPE_PARENCLOSE,
+		[]string{
+			`/^\)/`,
+		},
+		0,
+	},
+	&parseRule{
+		TYPE_COMMA,
+		[]string{
+			`/^,/`,
+		},
+		0,
+	},
+	&parseRule{
+		TYPE_LOGIC,
+		[]string{
+			`/^(&&|\|\|)\s*/`,
+			`/^(and|or)\s+/`,
+		},
+		1,
+		map[string]string{
+			"and": "&&",
+			"or":  "||",
+		},
+	},
+	&parseRule{
+		TYPE_COMPARATOR,
+		[]string{
+			`/^(===|==|\!==|\!=|<=|<|>=|>|in\s|gte\s|gt\s|lte\s|lt\s)\s*/`,
+		},
+		1,
+		map[string]string{
+			"gte": ">=",
+			"gt":  ">",
+			"lte": "<=",
+			"lt":  "<",
+		},
+	},
+	&parseRule{
+		TYPE_ASSIGNMENT,
+		[]string{
+			`/^(=|\+=|-=|\*=|\/=)/`,
+		},
+	},
+	&parseRule{
+		TYPE_NOT,
+		[]string{
+			`/^\!\s*/`,
+			`/^not\s+/`,
+		},
+		0,
+		map[string]string{
+			"not": "!",
+		},
+	},
+	&parseRule{
+		TYPE_BOOL,
+		[]string{
+			`/^(true|false)\s+/`,
+			`/^(true|false)$/`,
+		},
+		1,
+	},
+	&parseRule{
+		TYPE_VAR,
+		[]string{
+			`/^[a-zA-Z_$]\w*((\.\w*)+)?/`,
+			`/^[a-zA-Z_$]\w*/`,
+		},
+	},
+	&parseRule{
+		TYPE_BRACKETOPEN,
+		[]string{
+			`/^\[/`,
+		},
+	},
+	&parseRule{
+		TYPE_BRACKETCLOSE,
+		[]string{
+			`/^\]/`,
+		},
+	},
+	&parseRule{
+		TYPE_CURLYOPEN,
+		[]string{
+			`/^\{/`,
+		},
+	},
+	&parseRule{
+		TYPE_COLON,
+		[]string{
+			`/^\:/`,
+		},
+	},
+	&parseRule{
+		TYPE_CURLYCLOSE,
+		[]string{
+			`/^\}/`,
+		},
+	},
+	&parseRule{
+		TYPE_DOTKEY,
+		[]string{
+			`/^\.(\w+)/`,
+		},
+		1,
+	},
+	&parseRule{
+		TYPE_DOTKEY,
+		[]string{
+			`/^[+\-]?\d+(\.\d+)?/`,
+		},
+	},
+	&parseRule{
+		TYPE_OPERATOR,
+		[]string{
+			`/^(\+|\-|\/|\*|%)/`,
+		},
+	},
+}
